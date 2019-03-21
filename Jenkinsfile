@@ -1,7 +1,11 @@
-
 pipeline {
     agent any
-    stages{
+ 
+    tools {
+        maven 'localMaven'
+    }
+ 
+stages{
         stage('Build'){
             steps {
                 sh 'mvn clean package'
@@ -9,7 +13,7 @@ pipeline {
             post {
                 success {
                     echo 'Now Archiving...'
-                    archiveArtifacts artifacts: '**/*.war'
+                    archiveArtifacts artifacts: '**/target/*.war'
                 }
             }
         }
