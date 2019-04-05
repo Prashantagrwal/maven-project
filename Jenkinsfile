@@ -44,7 +44,6 @@ pipeline {
 
     }
 }
-*/
 
 pipeline {
   agent any
@@ -67,6 +66,45 @@ pipeline {
     stage("global") {
       steps {
         sh 'echo "FOO is $FOO and BAR is $BAR"'
+      }
+    }
+  }
+}
+*/
+
+// Define a groovy global variable, myVar.
+// A local, def myVar = 'initial_value', didn't work for me.
+// Your mileage may vary.
+// Defining the variable here maybe adds a bit of clarity,
+// showing that it is intended to be used across multiple stages.
+myVar = 'initial_value'
+
+pipeline {
+  agent { label 'docker' }
+  stages {
+    stage('one') {
+      steps {
+        echo "${myVar}" // prints 'initial_value'
+        sh 'echo hotness > myfile.txt'
+        script {
+          // trim removes leading and trailing whitespace from the string
+          myVar = readFile('myfile.txt').trim()
+        }
+        echo "${myVar}" // prints 'hotness'
+      }
+    }
+    stage('two') {
+      steps {
+        echo "${myVar}" // prints 'hotness'
+      }
+    }
+    // this stage is skipped due to the when expression, so nothing is printed
+    stage('three') {
+      when {
+        expression { myVar != 'hotness' }
+      }
+      steps {
+        echo "three: ${myVar}"
       }
     }
   }
