@@ -80,7 +80,7 @@ pipeline {
 myVar = 'initial_value'
 
 pipeline {
-  agent { label 'docker' }
+  agent any
   stages {
     stage('one') {
       steps {
